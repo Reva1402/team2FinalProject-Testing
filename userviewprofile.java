@@ -4,8 +4,10 @@ package myevents;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -260,8 +262,58 @@ public class userviewprofile {
         }
     }
     
+//    @Test
+//    public void testDelete() {
+//        System.out.println("Testing logout functionality...");
+//        driver.get("http://localhost:3000/userprofile");
+//
+//        try {
+//
+//            WebElement logoutButton = wait.until(ExpectedConditions.elementToBeClickable(By.className("logout-btn")));
+//            logoutButton.click();
+//
+//            WebElement loginPageHeader = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("login-header")));
+//            assertTrue(loginPageHeader.isDisplayed(), "Login page is not displayed after logout");
+//        } catch (Exception e) {
+//            System.out.println("Error during testLogout: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
     
 
+    @Test
+    public void testDeleteButton() {
+       
+        driver.get("http://localhost:3000/userprofile"); 
+
+       
+        WebElement deleteButton = driver.findElement(By.xpath("/html/body/div/div/div/div/div/button[2]"));
+
+        
+        deleteButton.click();
+
+    
+        try {
+            Thread.sleep(2000);  
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+       
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue(currentUrl.contains("deletedUserPage"));  
+        try {
+            Alert alert = driver.switchTo().alert();
+            String alertText = alert.getText();
+            assertTrue(alertText.contains("User deleted"));
+            alert.accept();
+        } catch (NoAlertPresentException e) {
+            fail("Alert was not shown after deletion");
+        }
+
+    
+    }
+    
     private void assertFalse(boolean contains, String string) {
 		// TODO Auto-generated method stub
 		
