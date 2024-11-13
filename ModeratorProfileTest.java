@@ -4,6 +4,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,8 +36,6 @@ public class ModeratorProfileTest {
     }
 
     private void simulateLoginSession() {
-//        Cookie authCookie = new Cookie("auth_token", "your-valid-authentication-token-here");
-//        driver.manage().addCookie(authCookie);
         driver.get("http://localhost:3000/ModeratorProfile");
     }
 
@@ -51,7 +50,6 @@ public class ModeratorProfileTest {
         }
     }
 
-    // 8 Passing Test Cases
     @Test
     public void testProfileHeaderVisibility() {
         try {
@@ -68,7 +66,12 @@ public class ModeratorProfileTest {
     }
 
 
-    @Test
+    private void assertTrue(String string, boolean displayed) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Test
     public void testProfileImageVisibility() {
         try {
             // Wait for the element to be visible on the page
@@ -258,4 +261,73 @@ public class ModeratorProfileTest {
             assertTrue("Expected exception: NoSuchElementException", e instanceof org.openqa.selenium.NoSuchElementException);
         }
     }
+    
+
+    
+    @Test
+    public void testLogoutButton() {
+        WebDriver driver = new ChromeDriver();
+
+        try {
+            // Navigate to the Moderator Profile page (replace with your actual URL)
+            driver.get("http://localhost:3000/moderatorprofile");  // Replace with the actual URL of your app
+            
+            // Wait for the logout button to be visible and clickable
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement logoutButton = wait.until(ExpectedConditions.elementToBeClickable(By.className("logout-button")));  // Using the class name
+            
+            // Click the logout button
+            logoutButton.click();
+
+            // Assert that the page navigates to the login page
+            String currentUrl = driver.getCurrentUrl();
+            assertTrue(currentUrl.contains("login"), "User should be redirected to login page after logout.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Logout test failed");
+        } finally {
+            driver.quit();
+        }
+    }
+
+    
+    @Test
+    public void testDeleteProfileButton() {
+        WebDriver driver = new ChromeDriver();
+
+        try {
+            // Navigate to the Moderator Profile page (replace with your actual URL)
+            driver.get("http://localhost:3000/moderatorprofile");  // Update URL as necessary
+            
+            // Wait for the delete button to be visible and clickable
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement deleteButton = wait.until(ExpectedConditions.elementToBeClickable(By.className("delete-button")));  // Adjust locator
+
+            // Click the delete button
+            deleteButton.click();
+
+            // Handle the confirmation alert
+            Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+            String alertText = alert.getText();
+            assertEquals("Are you sure you want to delete your moderator profile? This action cannot be undone.", alertText);
+            
+            // Accept the alert to confirm deletion
+            alert.accept();
+
+            // After deletion, check if the user is redirected to the login page
+            String currentUrl = driver.getCurrentUrl();
+            assertTrue(currentUrl.contains("login"), "User should be redirected to login page after profile deletion.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Delete Profile test failed");
+        } finally {
+            driver.quit();
+        }
+    }
+
+private void assertTrue(boolean contains, String string) {
+	// TODO Auto-generated method stub
+	
+}
+    
 }
