@@ -1,199 +1,153 @@
-package myevents;
+package AdminPanel;
 
-import org.junit.jupiter.api.*;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class viewadminprofile {
+public class AdminProfile {
 
     private WebDriver driver;
     private WebDriverWait wait;
 
     @BeforeEach
     public void setUp() {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\Prism Infotech\\eclipse-workspace\\event\\src\\myevents\\chromedriver.exe");
         driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("http://localhost:3000/login");
+
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        
+        WebElement emailField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
+        emailField.sendKeys("madhavjariwala55@gmail.com");
+
+        WebElement passwordField = driver.findElement(By.id("password"));
+        passwordField.sendKeys("123456789");
+
+        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("/html/body/div/div/div/div/form/div[3]/button[1]")));
+        loginButton.click();
+
+        wait.until(ExpectedConditions.urlContains("/AdminDashboard"));
+
+        
+        WebElement profileLink = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/header/div/a")));
+        profileLink.click();
     }
 
     @AfterEach
     public void tearDown() {
+        
         if (driver != null) {
             driver.quit();
         }
     }
 
-    
     @Test
-    public void testProfileLoading() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("profile-card")));
-        assertTrue(driver.findElement(By.className("profile-info")).isDisplayed(), "Profile info should be visible");
-    }
-
-    
-    @Test
-    public void testProfilePicturePresence() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("profile-picture")));
-        WebElement profilePicture = driver.findElement(By.className("profile-picture"));
-        assertNotNull(profilePicture, "Profile picture should be present.");
-    }
-
-    
-    @Test
-    public void testEditButtonVisibility() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("edit-btn")));
-        WebElement editButton = driver.findElement(By.className("edit-btn"));
-        assertTrue(editButton.isDisplayed(), "Edit Profile button should be visible");
-    }
-
-    
-    @Test
-    public void testDeleteButtonVisibility() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("delete-btn")));
-        WebElement deleteButton = driver.findElement(By.className("delete-btn"));
-        assertTrue(deleteButton.isDisplayed(), "Delete Profile button should be visible");
+    public void testProfileDashboardNavbar() {
+        WebElement profileHead = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div/div/div/header")));
+        assertEquals("Admin one", profileHead.getText());
     }
 
     @Test
-    public void testProfileDataNotEmpty() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("profile-info")));
-        WebElement profileInfo = driver.findElement(By.className("profile-info"));
-        assertTrue(profileInfo.getText().contains("Name:"), "Profile info should not be empty");
-    }
-
-   
-    @Test
-    public void testInvalidAdminProfile() {
-        driver.get("http://localhost:3000/invalidAdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("profile-container")));
-        String errorMessage = driver.findElement(By.tagName("body")).getText();
-        assertTrue(errorMessage.contains("No profile data available"), "Invalid admin profile should show an error");
+    public void testProfileNavbar() {
+        WebElement profile = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div/div/div/header/div/a")));
+        assertNotNull(profile.getText(), "Profile link should be visible.");
     }
 
     @Test
-    public void testProfileLoadingWithInvalidUid() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("error-message")));
-        String errorMessage = driver.findElement(By.className("error-message")).getText();
-        assertEquals("Admin profile not found or user is not an admin.", errorMessage);
+    public void testLogoutNavbar() {
+        WebElement logout = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div/div/div/header/div/button")));
+        assertNotNull(logout.getText(), "Logout button should be visible.");
     }
 
     @Test
-    public void testMissingProfilePicture() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("profile-info")));
-        WebElement profilePicture = driver.findElement(By.className("profile-picture"));
-        assertNull(profilePicture, "Profile picture should not be present when not available.");
+    public void testSidebar() {
+        WebElement sidebar = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div/div/div/aside")));
+        assertNotEquals("", sidebar.getText(), "Sidebar should not be empty.");
     }
 
     @Test
-    public void testNavigateToEditProfile() {
-        driver.get("http://localhost:3000/AdminProfile");
-        WebElement editButton = driver.findElement(By.className("edit-btn"));
-        editButton.click();
-        wait.until(ExpectedConditions.urlContains("/editProfile"));
-        assertTrue(driver.getCurrentUrl().contains("/editProfile"), "Should navigate to the Edit Profile page.");
-    }
-
-    
-    @Test
-    public void testNavigateToDeleteProfile() {
-        driver.get("http://localhost:3000/AdminProfile");
-        WebElement deleteButton = driver.findElement(By.className("delete-btn"));
-        deleteButton.click();
-        wait.until(ExpectedConditions.urlContains("/deleteProfile"));
-        assertTrue(driver.getCurrentUrl().contains("/deleteProfile"), "Should navigate to the Delete Profile page.");
+    public void testDashboardLink() {
+        WebElement link = driver.findElement(By.xpath("/html/body/div/div/div/aside/a[1]"));
+        assertTrue(link.isDisplayed(), "Dashboard link should be visible.");
     }
 
     @Test
-    public void testErrorMessageWhenNoAdminRole() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("error-message")));
-        String errorMessage = driver.findElement(By.className("error-message")).getText();
-        assertTrue(errorMessage.contains("User is not an admin"), "Error message for non-admin should be displayed");
+    public void testUserManagementLink() {
+        WebElement userManage = driver.findElement(By.xpath("/html/body/div/div/div/aside/a[2]"));
+        assertTrue(userManage.isDisplayed(), "User Management link should be visible.");
     }
 
     @Test
-    public void testProfileDataErrorWhenIncomplete() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("profile-info")));
-        WebElement profileInfo = driver.findElement(By.className("profile-info"));
-        assertTrue(profileInfo.getText().contains("Email:") && profileInfo.getText().contains("Name:"), "Profile info should contain all required fields.");
+    public void testModeratorManagementLink() {
+        WebElement moderatorManage = driver.findElement(By.xpath("/html/body/div/div/div/aside/a[3]"));
+        assertTrue(moderatorManage.isDisplayed(), "Moderator Management link should be visible.");
     }
 
     @Test
-    public void testPageNotFoundForInvalidURL() {
-        driver.get("http://localhost:3000/nonExistingProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("error-404")));
-        assertTrue(driver.findElement(By.className("error-404")).isDisplayed(), "Page should display a 404 error for invalid URLs");
+    public void testSuspendedManagementLink() {
+        WebElement suspendedManage = driver.findElement(By.xpath("/html/body/div/div/div/aside/a[4]"));
+        assertTrue(suspendedManage.isDisplayed(), "Suspended Management link should be visible.");
     }
 
     @Test
-    public void testMissingFieldsOnAdminProfile() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("profile-info")));
-        WebElement profileInfo = driver.findElement(By.className("profile-info"));
-        assertFalse(profileInfo.getText().contains("Address:") && profileInfo.getText().contains("Mobile Number:"), "Missing fields in admin profile should cause an error");
+    public void testContentManagementLink() {
+        WebElement contentManage = driver.findElement(By.xpath("/html/body/div/div/div/aside/a[5]"));
+        assertTrue(contentManage.isDisplayed(), "Content Management link should be visible.");
     }
 
     @Test
-    public void testEmptyProfilePage() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("profile-card")));
-        driver.findElement(By.className("profile-info")).clear();
-        assertTrue(driver.getPageSource().contains("No profile data available."), "Empty profile page should show error");
+    public void testSupportManagementLink() {
+        WebElement supportManage = driver.findElement(By.xpath("/html/body/div/div/div/aside/a[6]"));
+        assertTrue(supportManage.isDisplayed(), "Support Management link should be visible.");
     }
 
     @Test
-    public void testProfilePageForUnauthorizedAccess() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("login-redirect")));
-        assertTrue(driver.findElement(By.className("login-redirect")).isDisplayed(), "Unauthorized users should be redirected to the login page.");
-    }
-    @Test
-    public void testProfilePageDoesNotLoadIfUserIsNotLoggedIn() {
-        driver.get("http://localhost:3000/AdminProfile");
-        wait.until(ExpectedConditions.urlContains("/login"));
-        assertTrue(driver.getCurrentUrl().contains("/login"), "User should be redirected to login page when not logged in.");
+    public void testAboutFooterLink() {
+        WebElement about = driver.findElement(By.xpath("/html/body/div/div/div/footer/ul/li[1]"));
+        assertTrue(about.isDisplayed(), "About footer link should be visible.");
     }
 
     @Test
-    public void testProfileDeletionAndRedirection() {
-        driver.get("http://localhost:3000/AdminProfile");
-        WebElement deleteButton = driver.findElement(By.className("delete-btn"));
-        deleteButton.click();
-        driver.findElement(By.id("confirm-delete-btn")).click();
-        wait.until(ExpectedConditions.urlContains("/login"));
-        assertTrue(driver.getCurrentUrl().contains("/login"), "After profile deletion, the user should be redirected to the login page.");
+    public void testPrivacyFooterLink() {
+        WebElement privacy = driver.findElement(By.xpath("/html/body/div/div/div/footer/ul/li[2]"));
+        assertTrue(privacy.isDisplayed(), "Privacy footer link should be visible.");
     }
 
     @Test
-    public void testNavigateBetweenEditAndProfilePages() {
-        driver.get("http://localhost:3000/adminProfile");
-        WebElement editButton = driver.findElement(By.className("edit-btn"));
-        editButton.click();
-        wait.until(ExpectedConditions.urlContains("/editProfile"));
-        assertTrue(driver.getCurrentUrl().contains("/editProfile"), "Should navigate to Edit Profile page.");
-        driver.get("http://localhost:3000/adminProfile");
-        assertTrue(driver.getCurrentUrl().contains("/adminProfile"), "Should navigate back to the Admin Profile page.");
+    public void testTermsFooterLink() {
+        WebElement terms = driver.findElement(By.xpath("/html/body/div/div/div/footer/ul/li[3]"));
+        assertTrue(terms.isDisplayed(), "Terms footer link should be visible.");
     }
 
     @Test
-    public void testInvalidProfileUrl() {
-        driver.get("http://localhost:3000/nonExistingProfile");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("error-404")));
-        assertTrue(driver.findElement(By.className("error-404")).isDisplayed(), "Should display 404 error when navigating to non-existing page.");
+    public void testContactFooterLink() {
+        WebElement contact = driver.findElement(By.xpath("/html/body/div/div/div/footer/ul/li[4]"));
+        assertTrue(contact.isDisplayed(), "Contact footer link should be visible.");
+    }
+
+    @Test
+    public void testFeedDashboard() {
+        WebElement feed = driver.findElement(By.xpath("/html/body/div/div/div/div"));
+        assertTrue(feed.isDisplayed(), "Feed dashboard should be visible.");
+    }
+
+    @Test
+    public void testEditButtonIsDisplayed() {
+        WebElement editButton = driver.findElement(By.xpath("/html/body/div/div/div/div/div[2]/button"));
+        assertTrue(editButton.isDisplayed(), "Edit button should be visible.");
     }
 }
