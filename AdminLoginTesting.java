@@ -1,9 +1,8 @@
-package AdminLogin;
+package AdminPanel;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.openqa.selenium.Alert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,140 +11,141 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AdminLoginTesting {
+public class AdminLogin {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         driver = new ChromeDriver();
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        driver.get("http://localhost:3000/"); // Adjust the URL as necessary
+        driver.manage().window().maximize();
+
+        driver.get("http://localhost:3000/login");
+
+
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         driver.quit();
     }
 
-    // Test Case 1: Verify Login Page Loads and Elements Are Present
     @Test
-    public void testLoginPageElementsPresence() {
-        WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h1.text-center")));
-        assertEquals("Login", title.getText());
+    public void testNavbarWithEventopiaIsVisible() {
+        
+        WebElement navbar = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//nav[contains(@class, 'navbar')]"))); 
 
-        WebElement emailInput = driver.findElement(By.id("email"));
-        assertTrue(emailInput.isDisplayed());
+        
+        assertTrue("Navbar should be visible and contain the text 'Eventopia'", navbar.isDisplayed() && navbar.getText().contains("Eventopia"));
+    }
+    @Test
+    public void testServicesButtonVisibilityAndNavigation() {
+        
+        WebElement servicesButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/nav/ul/li[1]"))); 
 
-        WebElement passwordInput = driver.findElement(By.id("password"));
-        assertTrue(passwordInput.isDisplayed());
+        
+        servicesButton.click();
+        boolean isServicesPageLoaded = driver.getCurrentUrl().equals("http://localhost:3000/services");
 
-        WebElement loginButton = driver.findElement(By.className("login-btn"));
-        assertTrue(loginButton.isDisplayed());
+        assertTrue("The 'Services' button should be visible and navigate to 'http://localhost:3000/services'", isServicesPageLoaded);
+    }
+    @Test
+    public void testCallNumberVisibility() {
+        
+        WebElement callNumber = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/nav/ul/li[2]/button")));
 
-        WebElement forgotPasswordButton = driver.findElement(By.xpath("//button[contains(text(), 'Forgot Password?')]"));
-        assertTrue(forgotPasswordButton.isDisplayed());
+        
+        assertTrue("The 'Call Number' should be visible", callNumber.isDisplayed());
+    }
+    @Test
+    public void testSignupVisibility() {
+        
+        WebElement signupElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Signup')]"))); 
+
+        
+        assertTrue("The 'Signup' element should be visible", signupElement.isDisplayed());
+    }
+    
+    @Test
+    public void testEmailFieldVisibility() {
+        
+        WebElement emailField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div/form/div[1]/input"))); 
+
+        
+        assertTrue("The 'Email' field should be visible", emailField.isDisplayed());
+    }
+    
+    @Test
+    public void testPasswordFieldVisibility() {
+        
+        WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div/form/div[2]/input"))); 
+
+        
+        assertTrue("The 'Password' field should be visible", passwordField.isDisplayed());
+    }
+    @Test
+    public void testLoginButtonVisibility() {
+        
+        WebElement loginButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(text(),'Login')]"))); 
+
+        
+        assertTrue("The 'Login' button should be visible", loginButton.isDisplayed());
     }
 
-    // Test Case 2: Login with Valid Admin Credentials
     @Test
-    public void testLoginWithValidAdminCredentials() {
-        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
-        emailInput.sendKeys("admin@example.com"); // Replace with valid admin credentials
+    public void testNewHereVisibilityAndNavigation() {
+        
+        WebElement newHereElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div/form/div[3]/button[2]"))); 
 
-        WebElement passwordInput = driver.findElement(By.id("password"));
-        passwordInput.sendKeys("adminpassword");
+        
+        newHereElement.click();
 
-        WebElement loginButton = driver.findElement(By.className("login-btn"));
+        
+        boolean isRedirectedToHomePage = wait.until(ExpectedConditions.urlToBe("http://localhost:3000/"));
+        assertTrue("The 'New Here' link should redirect to 'http://localhost:3000/'", isRedirectedToHomePage);
+    }
+    @Test
+    public void testForgotPasswordVisibilityAndResetPasswordText() {
+        
+        WebElement forgotPasswordLink = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div[1]/form/div[3]/button[3]"))); 
+
+        
+        forgotPasswordLink.click();
+
+        
+        WebElement resetPasswordText = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div[2]/div/h2"))); 
+        assertTrue("Reset password text should be visible after clicking 'Forgot Password'", resetPasswordText.isDisplayed());
+    }
+    @Test
+    public void testLoginAndRedirection() {
+        
+        WebElement emailField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email"))); 
+        emailField.sendKeys("madhavjariwala55@gmail.com");
+
+        
+        WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password"))); 
+        passwordField.sendKeys("123456789");
+
+        
+        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(),'Login')]"))); 
         loginButton.click();
 
-        wait.until(ExpectedConditions.urlContains("/admin")); // Wait for admin page
-        assertEquals("http://localhost:3000/admin", driver.getCurrentUrl()); // Update URL if needed
+        
+        boolean isRedirectedToAdminDashboard = wait.until(ExpectedConditions.urlToBe("http://localhost:3000/AdminDashboard"));
+        assertTrue("Login should redirect to the Admin Dashboard at 'http://localhost:3000/AdminDashboard'", isRedirectedToAdminDashboard);
     }
 
-    // Test Case 3: Login with Invalid Email Format
-    @Test
-    public void testLoginWithInvalidEmailFormat() {
-        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
-        emailInput.sendKeys("invalid-email");
 
-        WebElement passwordInput = driver.findElement(By.id("password"));
-        passwordInput.sendKeys("password");
 
-        WebElement loginButton = driver.findElement(By.className("login-btn"));
-        loginButton.click();
 
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("Login failed. Please try again.", alert.getText());
-        alert.accept();
-    }
 
-    // Test Case 4: Forgot Password Modal with Valid Email
-    @Test
-    public void testForgotPasswordModalAndResetEmail() {
-        WebElement forgotPasswordButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'Forgot Password?')]")));
-        forgotPasswordButton.click();
 
-        WebElement modalTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("h2")));
-        assertEquals("Reset Password", modalTitle.getText());
 
-        WebElement resetEmailInput = driver.findElement(By.id("resetEmail"));
-        resetEmailInput.sendKeys("user@example.com");
-
-        WebElement resetButton = driver.findElement(By.className("reset-btn"));
-        resetButton.click();
-
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("Password reset email sent. Please check your inbox.", alert.getText());
-        alert.accept();
-    }
-
-    // Test Case 5: Forgot Password Modal with Invalid Email Format
-    @Test
-    public void testForgotPasswordWithInvalidEmailFormat() {
-        WebElement forgotPasswordButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'Forgot Password?')]")));
-        forgotPasswordButton.click();
-
-        WebElement resetEmailInput = driver.findElement(By.id("resetEmail"));
-        resetEmailInput.sendKeys("invalid-email");
-
-        WebElement resetButton = driver.findElement(By.className("reset-btn"));
-        resetButton.click();
-
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("Failed to send password reset email. Please try again.", alert.getText());
-        alert.accept();
-    }
-
-    // Test Case 6: Login with Empty Fields
-    @Test
-    public void testLoginWithEmptyFields() {
-        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.className("login-btn")));
-        loginButton.click();
-
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("Login failed. Please try again.", alert.getText());
-        alert.accept();
-    }
-
-    // Test Case 7: Login with Correct Email and Incorrect Password
-    @Test
-    public void testLoginWithCorrectEmailAndIncorrectPassword() {
-        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
-        emailInput.sendKeys("user@example.com"); // Replace with valid test email
-
-        WebElement passwordInput = driver.findElement(By.id("password"));
-        passwordInput.sendKeys("wrongpassword");
-
-        WebElement loginButton = driver.findElement(By.className("login-btn"));
-        loginButton.click();
-
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("Login failed. Please try again.", alert.getText());
-        alert.accept();
-    }
 }
