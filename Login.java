@@ -1,8 +1,4 @@
-package FinalProject;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.List;
+package UserProfile;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,117 +7,145 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-import junit.framework.Assert;
+import java.time.Duration;
+import java.util.List;
 
-class Login {
-	private WebDriver driver;
-	
-	 
-	 private void loadHomePage() {
-	        driver.get("http://localhost:3000/login");
-	    }
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-	@BeforeEach
-	void setUp() throws Exception {
-		
-		        driver = new ChromeDriver();
-	}
+public class userlogin {
+    private WebDriver driver;
+    private WebDriverWait wait;
 
-	@AfterEach
-	void tearDown() throws Exception {
-		  if (driver != null) {
-	            driver.quit();
-	}
-	}
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        driver.manage().window().maximize();
 
-	@Test
-	void testNavbar() {
-	    loadHomePage();	    
-	    WebElement navbar = driver.findElement(By.xpath("/html/body/div/div/div/nav")); 
-	    boolean checking = navbar.isSelected();
-	    Assert.assertFalse(checking);
-	}
-	 
-@Test
-void testemail() {
-	loadHomePage();
-	  WebElement email = driver.findElement(By.xpath("/html/body/div/div/div/div/div/form/div[1]/input"));
-	    boolean checking = email.isSelected();
-	    Assert.assertTrue(checking);	
-}
+        driver.get("http://localhost:3000/login");
 
-@Test
-void testpassword() {
-	loadHomePage();
-	  WebElement password = driver.findElement(By.xpath("/html/body/div/div/div/div/div/form/div[2]/input"));
-	    boolean checking = password.isSelected();
-	    Assert.assertFalse(checking);
-	
-}
 
-@Test
-void testsubmitbutton() {
-	 loadHomePage();
-        WebElement submitButton = driver.findElement(By.xpath("/html/body/div/div/div/div/div/form/div[3]/button[1]"));
-        submitButton.click();
-
-        Assert.assertTrue(submitButton.isSelected());
-
-	
-}
-
-	@Test
-	void testforgotpasslinl() {
-	    loadHomePage();
-	    
-	    WebElement forgotpass = driver.findElement(By.xpath("/html/body/div/div/div/div/div/form/div[3]/button[2]"));
-	    boolean checking = forgotpass.isSelected();
-	    Assert.assertNotNull(checking);
-	}
-	
-	@Test
-	void testsignuplinl() {
-	    loadHomePage();
-	    
-	    WebElement signuplink = driver.findElement(By.xpath("/html/body/div/div/div/div/div/form/div[3]/button[3]"));
-	    boolean checking = signuplink.isSelected();
-	    Assert.assertNotNull(checking);
-	}
-
-    @Test
-    void testPageNavigationToAbout() {
-    	loadHomePage();
-
-        WebElement aboutLink = driver.findElement(By.xpath("/html/body/div/div/div/footer/ul/li[1]"));
-        boolean checking = aboutLink.isSelected();
-	    Assert.assertNotNull(checking);
     }
-	
-    @Test
-    void testPageNavigationToPrivacyPolicy() {
-    	loadHomePage();
 
-        WebElement privacyPolicyLink = driver.findElement(By.xpath("/html/body/div/div/div/footer/ul/li[2]"));
-        boolean checking = privacyPolicyLink.isSelected();
-	    Assert.assertNotNull(checking);
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+
+    @Test
+    public void testNavbarWithEventopiaIsVisible() {
+        
+        WebElement navbar = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//nav[contains(@class, 'navbar')]"))); 
+
+        
+        assertTrue("Navbar should be visible and contain the text 'Eventopia'", navbar.isDisplayed() && navbar.getText().contains("Eventopia"));
+    }
+    @Test
+    public void testServicesButtonVisibilityAndNavigation() {
+        
+        WebElement servicesButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/nav/ul/li[1]"))); 
+
+        
+        servicesButton.click();
+        boolean isServicesPageLoaded = driver.getCurrentUrl().equals("http://localhost:3000/services");
+
+        assertTrue("The 'Services' button should be visible and navigate to 'http://localhost:3000/services'", isServicesPageLoaded);
+    }
+    @Test
+    public void testCallNumberVisibility() {
+        
+        WebElement callNumber = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/nav/ul/li[2]/button")));
+
+        
+        assertTrue("The 'Call Number' should be visible", callNumber.isDisplayed());
+    }
+    @Test
+    public void testSignupVisibility() {
+        
+        WebElement signupElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Signup')]"))); 
+
+        
+        assertTrue("The 'Signup' element should be visible", signupElement.isDisplayed());
     }
     
     @Test
-    void testPageNavigationToTnC() {
-    	loadHomePage();
+    public void testEmailFieldVisibility() {
+        
+        WebElement emailField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div/form/div[1]/input"))); 
 
-        WebElement TnCLink = driver.findElement(By.xpath("/html/body/div/div/div/footer/ul/li[3]"));
-        boolean checking = TnCLink.isSelected();
-	    Assert.assertNotNull(checking);
+        
+        assertTrue("The 'Email' field should be visible", emailField.isDisplayed());
     }
     
     @Test
-    void testPageNavigationToContactUs() {
-    	loadHomePage();
+    public void testPasswordFieldVisibility() {
+        
+        WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div/form/div[2]/input"))); 
 
-        WebElement ContactUsLink = driver.findElement(By.xpath("/html/body/div/div/div/footer/ul/li[4]"));
-        boolean checking = ContactUsLink.isSelected();
-	    Assert.assertNotNull(checking);
-    }	
-	}
+        
+        assertTrue("The 'Password' field should be visible", passwordField.isDisplayed());
+    }
+    @Test
+    public void testLoginButtonVisibility() {
+        
+        WebElement loginButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(text(),'Login')]"))); 
+
+        
+        assertTrue("The 'Login' button should be visible", loginButton.isDisplayed());
+    }
+
+    @Test
+    public void testNewHereVisibilityAndNavigation() {
+        
+        WebElement newHereElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div/form/div[3]/button[2]"))); 
+
+        
+        newHereElement.click();
+
+        
+        boolean isRedirectedToHomePage = wait.until(ExpectedConditions.urlToBe("http://localhost:3000/"));
+        assertTrue("The 'New Here' link should redirect to 'http://localhost:3000/'", isRedirectedToHomePage);
+    }
+    @Test
+    public void testForgotPasswordVisibilityAndResetPasswordText() {
+        
+        WebElement forgotPasswordLink = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div[1]/form/div[3]/button[3]"))); 
+
+        
+        forgotPasswordLink.click();
+
+        
+        WebElement resetPasswordText = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div/div/div[2]/div/h2"))); 
+        assertTrue("Reset password text should be visible after clicking 'Forgot Password'", resetPasswordText.isDisplayed());
+    }
+    @Test
+    public void testLoginAndRedirection() {
+        
+        WebElement emailField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email"))); 
+        emailField.sendKeys("nupurg1905@gmail.com");
+
+        
+        WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password"))); 
+        passwordField.sendKeys("Nupur@123");
+
+        
+        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(),'Login')]"))); 
+        loginButton.click();
+
+        
+        boolean isRedirectedToUserHomepage = wait.until(ExpectedConditions.urlToBe("http://localhost:3000/userhomepage"));
+        assertTrue("Login should redirect to the user homepage at 'http://localhost:3000/userhomepage'", isRedirectedToUserHomepage);
+    }
+
+
+
+
+
+
+
+}
